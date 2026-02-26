@@ -21,7 +21,23 @@ def scrape_today():
         if today_str in title:
             result.append(a.text.strip())
 
-    return list(dict.fromkeys(result))  # 重複を削除してリスト化
+    # 重複を削除
+    unique = list(dict.fromkeys(result))
+
+    # 不要な行を除外:
+    # - ページ見出し「今日 2月26日（木）の記念日・年中行事」
+    # - 日付だけの「26」などの数字のみの行
+    filtered = []
+    for text in unique:
+        # 見出し行（「今日 ～ の記念日・年中行事」）はスキップ
+        if "今日 " in text and "の記念日・年中行事" in text:
+            continue
+        # 数字だけの行（カレンダーの日付リンクなど）はスキップ
+        if text.isdigit():
+            continue
+        filtered.append(text)
+
+    return filtered
 
 class WhatDay(commands.Cog):
     def __init__(self, bot):
